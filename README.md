@@ -1,2 +1,2 @@
-# uRDAI
+# URDAI
 Unified Reconfigurable Device Access Interface
