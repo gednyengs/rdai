@@ -328,7 +328,7 @@ typedef struct URDAI_PlatformOps
      * @return status
      */
     URDAI_Status        (* mem_copy )           ( URDAI_MemObject *src, URDAI_MemObject *dest );
-
+        
     /**
      * Asynchronous copy from a memory object to another
      *
