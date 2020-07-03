@@ -64,6 +64,7 @@ typedef enum URDAI_PlatformType
     URDAI_UNKNOWN_PLATFORM              = 0,
     URDAI_FPGA_PLATFORM                 = 1,
     URDAI_CGRA_PLATFORM                 = 2,
+    URDAI_CLOCKWORK_PLATFORM            = 3,
 
 } URDAI_PlatformType;
 
@@ -98,6 +99,7 @@ typedef enum URDAI_StatusCode
     URDAI_UNKNOWN_STATUS_CODE           = 0,
     URDAI_INITIALIZED                   = 1,
     URDAI_UNINITIALIZED                 = 2,
+    URDAI_OK                            = 3,
 
 } URDAI_StatusCode;
 
@@ -328,7 +330,7 @@ typedef struct URDAI_PlatformOps
      * @return status
      */
     URDAI_Status        (* mem_copy )           ( URDAI_MemObject *src, URDAI_MemObject *dest );
-        
+
     /**
      * Asynchronous copy from a memory object to another
      *
