@@ -7,11 +7,15 @@
 
 #include "HalideBuffer.h"
 #include "halide_image_io.h"
+#include "clockwork_testscript.cpp"
+#include "unoptimized_conv_3_3.cpp"
 
 using namespace Halide::Tools;
 using namespace Halide::Runtime;
 
 static uint32_t hardware_id = 1;
+static URDAI_ID urdai_id = {hardware_id};
+static URDAI_VLNV urdai_vlnv;
 
 static std::vector< std::future<void*> > asyncFutures;
 static uint32_t async_id = 1;
@@ -124,10 +128,12 @@ static URDAI_Platform* clockwork_platform_create( void )
 {
 	URDAI_Platform *platform = (URDAI_Platform *) malloc(sizeof(URDAI_Platform));
 
-	platform->type 			= URDAI_CLOCKWORK_PLATFORM;
-	platform->id.value 		= hardware_id;
+	struct URDAI_Device device = {urdai_id, urdai_vlnv, platform, NULL, 1};
+	struct URDAI_Platform temp_platform = {URDAI_CLOCKWORK_PLATFORM, urdai_id, NULL, &device};
+			
 	hardware_id++;
-	//platform->property_list = NULL;
+
+	memcpy(platform, &temp_platform, sizeof(URDAI_Platform));
 
 	return platform;
 }
@@ -166,34 +172,50 @@ TO_DO: adjust device_run to accomodate URDAI_Devices and URDAI_MemObjects
 static URDAI_Status run_clockwork_device( URDAI_Device *device, 
 										  URDAI_MemObject *mem_object_list )
 {
-    // input image and run on design
-    HWStream<hw_uint<16> > input_stream;
-    HWStream<hw_uint<16> > output_stream;
-    for (int y = 0; y < input.height(); y++) {
-    for (int x = 0; x < input.width(); x++) {
-    for (int c = 0; c < input.channels(); c++) {
-      hw_uint<16> in_val;
-      set_at<0*16, 16, 16>(in_val, input(x, y, c));
-      input_stream.write(in_val);
-    } } }
+	Buffer<uint8_t> input(64, 64);
+	memcpy(input.begin(), mem_object_list->host_ptr, mem_object_list->size);
+	Buffer<uint8_t> output(62, 62);
 
-    // run function
-    unoptimized_conv_3_3(input_stream, output_stream);
+	run_clockwork_program(input, output);
+	memcpy(mem_object_list[1].host_ptr, output.begin(), mem_object_list[1].size);
 
-    // copy to output
-    for (int y = 0; y < output.height(); y++) {
-    for (int x = 0; x < output.width(); x++) {
-    for (int c = 0; c < output.channels(); c++) {
-      hw_uint<16> actual = output_stream.read();
-      auto actual_lane_0 = actual.extract<0*16, 15>();
-      output(x, y, c) = actual_lane_0;
-    } } }
+	std::string output_filename = "output_conv_3_3.png";
+	convert_and_save_image(output, output_filename);
+	cout << "First pixel of output..." << endl;
+	cout << (int) output(0, 0) << endl;	
+
+	std::cout << "Ran " << "conv_3_3" << " on " << "clockwork" << "\n";
+
+	URDAI_Status status;
+	status.status_code = URDAI_OK;
+	return status;
+}
+
+void* run_clockwork_device_async_helper( URDAI_Device *device,
+												URDAI_MemObject *mem_object_list )
+{
+	Buffer<uint8_t> input(64, 64);
+	memcpy(input.begin(), mem_object_list->host_ptr, mem_object_list->size);
+	Buffer<uint8_t> output(62, 62);
+
+	run_clockwork_program(input, output);
+	memcpy(mem_object_list[1].host_ptr, output.begin(), mem_object_list[1].size);
+
+	std::string output_filename = "output_conv_3_3_async.png";
+	convert_and_save_image(output, output_filename);
+	cout << "First pixel of output..." << endl;
+	cout << (int) output(0, 0) << endl;	
+
+	std::cout << "Ran " << "conv_3_3 " << "async" << " on " << "clockwork" << "\n";
 }
 
 static URDAI_Status run_clockwork_device_async( URDAI_Device *device, 
 												URDAI_MemObject *mem_object_list )
 {
-
+	asyncFutures.push_back( std::async( run_clockwork_device_async_helper, device, mem_object_list ));
+	URDAI_Status status;
+	status.status_code = URDAI_OK;
+	return status;
 }
 
 static URDAI_Status clockwork_sync( URDAI_AsyncHandle *async_handle )
@@ -232,21 +254,41 @@ struct URDAI_PlatformOps Clockwork_URDAI_Ops = {
 }
 #endif
 
+URDAI_MemObject* load_halide_buffer_to_mem_object(URDAI_Platform* platform, 
+												  Buffer<uint8_t> buffer, size_t size)
+{
+	URDAI_MemObject* memObject = Clockwork_URDAI_Ops.mem_allocate(URDAI_MEM_SHARED, 
+																  size, platform->device_list);
+
+	memcpy(memObject->host_ptr, buffer.begin(), size);
+
+	return memObject;
+}
+
+URDAI_MemObject* initialize_mem_object_list(URDAI_MemObject* input, URDAI_MemObject* output)
+{
+	URDAI_MemObject* mem_obj_list = (URDAI_MemObject *) malloc(3 * sizeof(URDAI_MemObject));
+	memcpy(&mem_obj_list[0], input, sizeof(URDAI_MemObject));
+	memcpy(&mem_obj_list[1], output, sizeof(URDAI_MemObject));
+	// last element must be null
+	memset(&mem_obj_list[2], 0, sizeof(URDAI_MemObject));
+
+	return mem_obj_list;
+}
+
 int main( int argc, char *argv[] )
 {
 	URDAI_Platform* clockwork_platform = Clockwork_URDAI_Ops.platform_create();
 
-	Buffer<float> input(64,64);
-	//std::cout << argv[1] << "\n";
-	input = load_and_convert_image((std::string) argv[1]);
+	Buffer<uint8_t> input = load_and_convert_image((std::string) argv[1]);
+	Buffer<uint8_t> output(62,62);
+
+	URDAI_MemObject* URDAI_input = load_halide_buffer_to_mem_object(clockwork_platform, 
+																	input, input.size_in_bytes());
+	URDAI_MemObject* URDAI_output = load_halide_buffer_to_mem_object(clockwork_platform, output, output.size_in_bytes());
 	
-	size_t size = input.size_in_bytes();
-	std::cout << "Size in Bytes: " << size << "\n";
+	URDAI_MemObject* mem_obj_list = initialize_mem_object_list(URDAI_input, URDAI_output);
 
-	URDAI_MemObject* input_object = Clockwork_URDAI_Ops.mem_allocate(URDAI_MEM_SHARED, size, clockwork_platform->device_list);
-
-	memcpy(input_object->host_ptr, input.begin(), size);
-
-
+	run_clockwork_device(clockwork_platform->device_list, mem_obj_list);
 
 }
