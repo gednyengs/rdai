@@ -16,8 +16,8 @@
  * under the License.
  */
 
-#ifndef URDAI_TYPES_H
-#define URDAI_TYPES_H
+#ifndef RDAI_TYPES_H
+#define RDAI_TYPES_H
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -28,83 +28,83 @@ extern "C" {
 
 /* Constants */
 
-#ifndef URDAI_STRING_ID_LENGTH
-    #define URDAI_STRING_ID_LENGTH          32      // Length of a String ID
-#endif // URDAI_STRING_ID_LENGTH
+#ifndef RDAI_STRING_ID_LENGTH
+    #define RDAI_STRING_ID_LENGTH       32      // Length of a String ID
+#endif // RDAI_STRING_ID_LENGTH
 
 /* Forward Declarations */
-struct URDAI_Platform;
-struct URDAI_Device;
+struct RDAI_Platform;
+struct RDAI_Device;
 
 /**
- * URDAI Hardware ID
+ * RDAI Hardware ID
  *
  * @value: an unsigned 32-bit value representing a hardware ID.
  *         Valid ID value must be > 0
  */
-typedef struct URDAI_ID
+typedef struct RDAI_ID
 {
     uint32_t value;
 
-} URDAI_ID;
+} RDAI_ID;
 
 /**
- * URDAI Hardware Platform Type
+ * RDAI Hardware Platform Type
  *
  * Platform types can be as generic or as specific as needed.
  * This enum provides a mechanism to add additional platform types
  *
- * @URDAI_UNKNOWN_PLATFORM: specifies an unknown platform
- * @URDAI_FPGA_PLATFORM: specifies a generic FPGA platform
- * @URDAI_CGRA_PLATFORM: specifies a generic CGRA platform
+ * @RDAI_UNKNOWN_PLATFORM: specifies an unknown platform
+ * @RDAI_FPGA_PLATFORM: specifies a generic FPGA platform
+ * @RDAI_CGRA_PLATFORM: specifies a generic CGRA platform
  *
  */
-typedef enum URDAI_PlatformType
+typedef enum RDAI_PlatformType
 {
-    URDAI_UNKNOWN_PLATFORM              = 0,
-    URDAI_FPGA_PLATFORM                 = 1,
-    URDAI_CGRA_PLATFORM                 = 2,
-    URDAI_CLOCKWORK_PLATFORM            = 3,
+    RDAI_UNKNOWN_PLATFORM              = 0,
+    RDAI_FPGA_PLATFORM                 = 1,
+    RDAI_CGRA_PLATFORM                 = 2,
+    RDAI_CLOCKWORK_PLATFORM            = 3,
 
-} URDAI_PlatformType;
+} RDAI_PlatformType;
 
 /**
- * URDAI Property
+ * RDAI Property
  *
  * This enum is used to specify both platform and device properties
  *
- * @URDAI_UNKNOWN_PROPERTY: specifies an unknown property
- * @URDAI_DEVICE_MEM_PRESENT: specifies that the device supports
- *                            URDAI_MEM_DEVICE memory objects
+ * @RDAI_UNKNOWN_PROPERTY: specifies an unknown property
+ * @RDAI_DEVICE_MEM_PRESENT: specifies that the device supports
+ *                            RDAI_MEM_DEVICE memory objects
  */
-typedef enum URDAI_Property
+typedef enum RDAI_Property
 {
-    URDAI_UNKNOWN_PROPERTY              = 0,    
-    URDAI_DEVICE_MEM_PRESENT            = 1,
+    RDAI_UNKNOWN_PROPERTY              = 0,    
+    RDAI_DEVICE_MEM_PRESENT            = 1,
 
-} URDAI_Property;
+} RDAI_Property;
 
 /**
- * URDAI Status Code
+ * RDAI Status Code
  *
  * This enum captures all the status codes supported.
  *
- * @URDAI_UNKNOWN_STATUS_CODE: specifies an unknown status code 
- * @URDAI_INITIALIZED: specifies that an entity is initialized and ready to be used
- * @URDAI_UNINITIALIZED: specifies that an entity is not initialized and
+ * @RDAI_UNKNOWN_STATUS_CODE: specifies an unknown status code 
+ * @RDAI_INITIALIZED: specifies that an entity is initialized and ready to be used
+ * @RDAI_UNINITIALIZED: specifies that an entity is not initialized and
  *                       therefore isn't ready for use
  */
-typedef enum URDAI_StatusCode
+typedef enum RDAI_StatusCode
 {
-    URDAI_UNKNOWN_STATUS_CODE           = 0,
-    URDAI_INITIALIZED                   = 1,
-    URDAI_UNINITIALIZED                 = 2,
-    URDAI_OK                            = 3,
+    RDAI_UNKNOWN_STATUS_CODE           = 0,
+    RDAI_INITIALIZED                   = 1,
+    RDAI_UNINITIALIZED                 = 2,
+    RDAI_OK                            = 3,
 
-} URDAI_StatusCode;
+} RDAI_StatusCode;
 
 /**
- * URDAI Handle for Asynchronous Calls
+ * RDAI Handle for Asynchronous Calls
  *
  * Asynchronous API calls can be later synchronized using information
  * returned in this struct
@@ -112,15 +112,15 @@ typedef enum URDAI_StatusCode
  * @id: the handle ID. Valid ID must be > than 0
  * @platform: platform which issued this handle
  */
-typedef struct URDAI_AsyncHandle
+typedef struct RDAI_AsyncHandle
 {
-    URDAI_ID id;
-    URDAI_Platform *platform;
+    RDAI_ID id;
+    RDAI_Platform *platform;
 
-} URDAI_AsyncHandle;
+} RDAI_AsyncHandle;
 
 /**
- * URDAI Status
+ * RDAI Status
  *
  * A struct to represent a status that is usable across both synchronous
  * and asynchronous API calls
@@ -129,15 +129,15 @@ typedef struct URDAI_AsyncHandle
  * @async_handle: If an async API call is made, async_handle will contain
  *                synchronization info
  */
-typedef struct URDAI_Status
+typedef struct RDAI_Status
 {
-    URDAI_StatusCode status_code;
-    URDAI_AsyncHandle async_handle;
+    RDAI_StatusCode status_code;
+    RDAI_AsyncHandle async_handle;
 
-} URDAI_Status;
+} RDAI_Status;
 
 /**
- * URDAI Platform
+ * RDAI Platform
  *
  * A Platform is a reconfigurable device on which accelerators
  * can be implemented.
@@ -149,27 +149,27 @@ typedef struct URDAI_Status
  * @device_list: a NULL-terminated list of devices provided by the platform
  *               (when NULL, the list is assumed empty)
  */
-typedef struct URDAI_Platform
+typedef struct RDAI_Platform
 {
-    URDAI_PlatformType type;
-    URDAI_ID id;
-    URDAI_Property *const property_list;
-    URDAI_Device *const device_list;
+    RDAI_PlatformType type;
+    RDAI_ID id;
+    RDAI_Property **property_list;
+    RDAI_Device **device_list;
 
-} URDAI_Platform;
+} RDAI_Platform;
 
-/* URDAI String ID
+/* RDAI String ID
  *
  * This struct defines a generic String ID
  *
  * @value: a null-terminated and size-constrained array of characters representing a String ID
- * Note: value[URDAI_STRING_ID_LENGTH - 1] is assumed to be '\0'
+ * Note: value[RDAI_STRING_ID_LENGTH - 1] is assumed to be '\0'
  */
-typedef struct URDAI_StringID
+typedef struct RDAI_StringID
 {
-    char value[URDAI_STRING_ID_LENGTH];
+    char value[RDAI_STRING_ID_LENGTH];
 
-} URDAI_StringID;
+} RDAI_StringID;
 
 /**
  * VLNV Descriptor
@@ -181,17 +181,17 @@ typedef struct URDAI_StringID
  * @name: the name of an accelerator device
  * @version: the version of an accelerator device
  */
-typedef struct URDAI_VLNV
+typedef struct RDAI_VLNV
 {
-    URDAI_StringID vendor;
-    URDAI_StringID library;
-    URDAI_StringID name;
+    RDAI_StringID vendor;
+    RDAI_StringID library;
+    RDAI_StringID name;
     uint32_t version;
 
-} URDAI_VLNV;
+} RDAI_VLNV;
 
 /**
- * URDAI Accelerator Device
+ * RDAI Accelerator Device
  *
  * An accelerator device is a device dedicated to the computation
  * of a hardware kernel within a given hardware platform
@@ -206,80 +206,80 @@ typedef struct URDAI_VLNV
  * NOTE: accelerator device are assumed to have only 1 output.
  *       However, the output can be a tuple
  */
-typedef struct URDAI_Device
+typedef struct RDAI_Device
 {
-    URDAI_ID id;
-    URDAI_VLNV vlnv;
-    URDAI_Platform *const platform;
-    URDAI_Property *const property_list;
+    RDAI_ID id;
+    RDAI_VLNV vlnv;
+    RDAI_Platform *platform;
+    RDAI_Property **property_list;
     uint32_t num_inputs;
 
-} URDAI_Device;
+} RDAI_Device;
 
 /**
- * URDAI Memory Object Type
+ * RDAI Memory Object Type
  *
  * This enum specifies the supported types of memory objects
  *
- * @URDAI_MEM_UNKNOWN: specifies an unknown memory object type
- * @URDAI_MEM_HOST: specifies a memory object with host view only
- * @URDAI_MEM_DEVICE: specifies a memory object with device view only
- * @URDAI_MEM_SHARED: specifies a memory object with both host and device views
+ * @RDAI_MEM_UNKNOWN: specifies an unknown memory object type
+ * @RDAI_MEM_HOST: specifies a memory object with host view only
+ * @RDAI_MEM_DEVICE: specifies a memory object with device view only
+ * @RDAI_MEM_SHARED: specifies a memory object with both host and device views
  */
-typedef enum URDAI_MemObjectType
+typedef enum RDAI_MemObjectType
 {
-    URDAI_MEM_UNKNOWN                   = 0,
-    URDAI_MEM_HOST                      = 1,
-    URDAI_MEM_DEVICE                    = 2,
-    URDAI_MEM_SHARED                    = 3,
+    RDAI_MEM_UNKNOWN                   = 0,
+    RDAI_MEM_HOST                      = 1,
+    RDAI_MEM_DEVICE                    = 2,
+    RDAI_MEM_SHARED                    = 3,
 
-} URDAI_MemObjectType;
+} RDAI_MemObjectType;
 
 /**
- * URDAI Memory Object View Type
+ * RDAI Memory Object View Type
  *
  * This enum specifies the supported types of views for a memory object
  *
- * @URDAI_VIEW_UNKNOWN: specifies an unkown view type
- * @URDAI_VIEW_FULL: specifies that the associated memory object is the original object
- * @URDAI_VIEW_CROP: specifies that the associated memory object is a crop/slice of another memory object
+ * @RDAI_VIEW_UNKNOWN: specifies an unkown view type
+ * @RDAI_VIEW_FULL: specifies that the associated memory object is the original object
+ * @RDAI_VIEW_CROP: specifies that the associated memory object is a crop/slice of another memory object
  */
-typedef enum URDAI_MemViewType
+typedef enum RDAI_MemViewType
 {
-    URDAI_VIEW_UNKNOWN                  = 0,
-    URDAI_VIEW_FULL                     = 1,
-    URDAI_VIEW_CROP                     = 2,
+    RDAI_VIEW_UNKNOWN                  = 0,
+    RDAI_VIEW_FULL                     = 1,
+    RDAI_VIEW_CROP                     = 2,
 
-} URDAI_MemViewType;
+} RDAI_MemViewType;
 
 /**
- * URDAI Memory Object
+ * RDAI Memory Object
  *
  * This struct defines a Memory Object. A memory object is a representation of
  * a data buffer in a specific address space
  *
  * @mem_type: the type of the memory object
  * @view_type: the view type of the memory object
- * @device: in the case of a URDAI_MEM_DEVICE memory object, this specifies the device
+ * @device: in the case of a RDAI_MEM_DEVICE memory object, this specifies the device
  *          holding the memory object. For non-device memory objects, this field
  *          should be NULL
  * @parent: for a crop, this represents the parent memory object from which
- *          the crop is created. For URDAI_VIEW_FULL memory objects, this field should be NULL
- * @host_ptr: a host address view of the memory object (for URDAI_MEM_HOST and URDAI_MEM_SHARED memory objects).
- *            This field should be NULL for URDAI_MEM_DEVICE memory objects
- * @device_ptr: a device address view of the memory object (for URDAI_MEM_DEVICE memory objects).
- *              This field should be NULL for non URDAI_MEM_DEVICE memory object types
+ *          the crop is created. For RDAI_VIEW_FULL memory objects, this field should be NULL
+ * @host_ptr: a host address view of the memory object (for RDAI_MEM_HOST and RDAI_MEM_SHARED memory objects).
+ *            This field should be NULL for RDAI_MEM_DEVICE memory objects
+ * @device_ptr: a device address view of the memory object (for RDAI_MEM_DEVICE memory objects).
+ *              This field should be NULL for non RDAI_MEM_DEVICE memory object types
  * @size: size in bytes of the memory object
  * @flags: memory object flags
  * @user_tag: a user-defined tag for the memory object
  */
-typedef struct URDAI_MemObject URDAI_MemObject;
-struct URDAI_MemObject
+typedef struct RDAI_MemObject RDAI_MemObject;
+struct RDAI_MemObject
 {
-    URDAI_MemObjectType mem_type;
-    URDAI_MemViewType view_type;
-    URDAI_Device *device;
-    URDAI_MemObject *parent;
+    RDAI_MemObjectType mem_type;
+    RDAI_MemViewType view_type;
+    RDAI_Device *device;
+    RDAI_MemObject *parent;
     uint8_t *host_ptr;
     uint8_t *device_ptr;
     size_t size;
@@ -288,13 +288,13 @@ struct URDAI_MemObject
 };
 
 /**
- * URDAI Platform Operations
+ * RDAI Platform Operations
  *
  * This struct provides an interface that must be implemented by hardware platforms.
- * Any platform that implements this interface can seamlessly work with URDAI-enabled environments
+ * Any platform that implements this interface can seamlessly work with RDAI-enabled environments
  *
  */
-typedef struct URDAI_PlatformOps
+typedef struct RDAI_PlatformOps
 {
     // ================================
     // Memory Management
@@ -308,9 +308,9 @@ typedef struct URDAI_PlatformOps
      * @param device The device on which to make the allocation (pointer)
      * @return the allocated memory object or NULL
      * */
-    URDAI_MemObject *   (* mem_allocate )       ( URDAI_MemObjectType mem_object_type,
+    RDAI_MemObject *   (* mem_allocate )       ( RDAI_MemObjectType mem_object_type,
                                                   size_t size,
-                                                  URDAI_Device *device
+                                                  RDAI_Device *device
                                                 );
     /**
      * Free allocated memory on a device
@@ -318,29 +318,29 @@ typedef struct URDAI_PlatformOps
      * @param mem_object The allocated memory object (pointer)
      * @return status
      */
-    URDAI_Status        (* mem_free )           ( URDAI_MemObject *mem_object );
+    RDAI_Status        (* mem_free )           ( RDAI_MemObject *mem_object );
 
     /**
      * Synchronous copy from a memory object to another
      *
-     * One of the memory objects must be a URDAI_MEM_DEVICE memory object
+     * One of the memory objects must be a RDAI_MEM_DEVICE memory object
      *
      * @param src The source memory object (pointer)
      * @param dest The destination memory object (pointer)
      * @return status
      */
-    URDAI_Status        (* mem_copy )           ( URDAI_MemObject *src, URDAI_MemObject *dest );
+    RDAI_Status        (* mem_copy )           ( RDAI_MemObject *src, RDAI_MemObject *dest );
 
     /**
      * Asynchronous copy from a memory object to another
      *
-     * One of the memory objects must be a URDAI_MEM_DEVICE memory object
+     * One of the memory objects must be a RDAI_MEM_DEVICE memory object
      *
      * @param src The source memory object (pointer)
      * @param dest The destination memory object (pointer)
      * @return status (with async handle)
      */
-    URDAI_Status        (* mem_copy_async )     ( URDAI_MemObject *src, URDAI_MemObject *dest );
+    RDAI_Status        (* mem_copy_async )     ( RDAI_MemObject *src, RDAI_MemObject *dest );
 
     /**
      * Crop/Slice a memory object
@@ -350,7 +350,7 @@ typedef struct URDAI_PlatformOps
      * @param cropped_size The size in bytes of the resulting cropped memory object
      * @return The cropped memory object or NULL
      */
-    URDAI_MemObject*    (* mem_crop )           ( URDAI_MemObject *src, size_t offset, size_t cropped_size );
+    RDAI_MemObject*    (* mem_crop )           ( RDAI_MemObject *src, size_t offset, size_t cropped_size );
 
     /**
      * Free a crop
@@ -358,7 +358,7 @@ typedef struct URDAI_PlatformOps
      * @param cropped_mem_object The crop to free (pointer)
      * @return status
      */
-    URDAI_Status        (* mem_free_crop )      ( URDAI_MemObject *cropped_mem_object );
+    RDAI_Status        (* mem_free_crop )      ( RDAI_MemObject *cropped_mem_object );
 
     // ================================
     // Device and Platform Management 
@@ -369,7 +369,7 @@ typedef struct URDAI_PlatformOps
      *
      * @return A hardware platform or NULL
      */
-    URDAI_Platform*     (* platform_create )    ( void );
+    RDAI_Platform*     (* platform_create )    ( void );
 
     /**
      * Destroy a hardware platform
@@ -377,7 +377,7 @@ typedef struct URDAI_PlatformOps
      * @param platform The platform to destroy (pointer)
      * @return status
      */
-    URDAI_Status        (* platform_destroy )   ( URDAI_Platform *platform );
+    RDAI_Status        (* platform_destroy )   ( RDAI_Platform *platform );
 
     /**
      * Initialize a hardware platform
@@ -388,7 +388,7 @@ typedef struct URDAI_PlatformOps
      * @param user_data Platform-dependent initialization context/data (opaque pointer)
      * @return status
      */
-    URDAI_Status        (* platform_init )      ( URDAI_Platform *platform, void *user_data );
+    RDAI_Status        (* platform_init )      ( RDAI_Platform *platform, void *user_data );
 
     /**
      * Deinitialize a hardware platform
@@ -399,7 +399,7 @@ typedef struct URDAI_PlatformOps
      * @param user_data Platform-dependent context/data (opaque pointer)
      * @return status
      */
-    URDAI_Status        (* platform_deinit )    ( URDAI_Platform *platform, void *user_data );
+    RDAI_Status        (* platform_deinit )    ( RDAI_Platform *platform, void *user_data );
 
     /**
      * Initialize an accelerator device
@@ -410,7 +410,7 @@ typedef struct URDAI_PlatformOps
      * @param user_data Device-dependent context/data (opaque pointer)
      * @return status
      */
-    URDAI_Status        (* device_init )        ( URDAI_Device *device, void *user_data );
+    RDAI_Status        (* device_init )        ( RDAI_Device *device, void *user_data );
 
     /**
      * Deinitialize an accelerator device
@@ -421,7 +421,7 @@ typedef struct URDAI_PlatformOps
      * @param user_data Device-dependent context/data (opaque pointer)
      * @return status
      */
-    URDAI_Status        (* device_deinit )      ( URDAI_Device *device, void *user_data );
+    RDAI_Status        (* device_deinit )      ( RDAI_Device *device, void *user_data );
 
     // ================================
     // Execution
@@ -438,7 +438,7 @@ typedef struct URDAI_PlatformOps
      *
      * NOTE: The positional meaning of the input memory objects is device-dependent
      */
-    URDAI_Status        (* device_run )         ( URDAI_Device *device, URDAI_MemObject *mem_object_list );
+    RDAI_Status        (* device_run )         ( RDAI_Device *device, RDAI_MemObject **mem_object_list );
 
     /**
      * Asynchronously run an accelerator device
@@ -451,7 +451,7 @@ typedef struct URDAI_PlatformOps
      *
      * NOTE: The positional meaning of the input memory objects is device-dependent
      */
-    URDAI_Status        (* device_run_async )   ( URDAI_Device *device, URDAI_MemObject *mem_object_list );
+    RDAI_Status        (* device_run_async )   ( RDAI_Device *device, RDAI_MemObject **mem_object_list );
 
     /**
      * Synchronize execution for an async call
@@ -459,13 +459,13 @@ typedef struct URDAI_PlatformOps
      * @param async_handle The handle to the async call to synchronize
      * @return status
      */
-    URDAI_Status        ( *sync )               ( URDAI_AsyncHandle *async_handle );
+    RDAI_Status        ( *sync )               ( RDAI_AsyncHandle *async_handle );
 
-} URDAI_PlatformOps;
+} RDAI_PlatformOps;
 
 
 #ifdef __cplusplus
 }
 #endif // __cplusplus
 
-#endif // URDAI_TYPES_H
+#endif // RDAI_TYPES_H
