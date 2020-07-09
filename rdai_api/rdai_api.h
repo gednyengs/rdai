@@ -287,7 +287,7 @@ RDAI_Status RDAI_device_deinit( RDAI_Device *device, void *user_data );
  * Synchronously run an accelerator device
  *
  * @param device The device to run
- * @param mem_object_list A NULL-terminated list of memory objects pointers.
+ * @param mem_object_list A NULL-terminated list of memory object pointers.
  *                  The last (non-NULL) element designates the output memory object.
  *                  All other elements designate input memory objects.
  * @return status
@@ -300,7 +300,7 @@ RDAI_Status RDAI_device_run( RDAI_Device *device, RDAI_MemObject **mem_object_li
  * Asynchronously run an accelerator device
  *
  * @param device The device to run
- * @param mem_object_list A NULL-terminated list of memory objects pointers.
+ * @param mem_object_list A NULL-terminated list of memory object pointers.
  *                  The last element is the output memory object.
  *                  All other elements are input memory objects.
  * @return status (with async handle)
