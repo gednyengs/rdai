@@ -100,6 +100,7 @@ typedef enum URDAI_StatusCode
     URDAI_INITIALIZED                   = 1,
     URDAI_UNINITIALIZED                 = 2,
     URDAI_OK                            = 3,
+    URDAI_SYNCHRONIZED                  = 4,
 
 } URDAI_StatusCode;
 

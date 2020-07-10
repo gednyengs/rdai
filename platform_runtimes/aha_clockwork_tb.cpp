@@ -17,7 +17,7 @@ static uint32_t hardware_id = 1;
 static URDAI_ID urdai_id = {hardware_id};
 static URDAI_VLNV urdai_vlnv;
 
-static std::vector< std::future<void*> > asyncFutures;
+static std::vector< std::future<URDAI_Status> > asyncStatuses;
 static uint32_t async_id = 1;
 
 /**
@@ -64,26 +64,36 @@ static URDAI_Status clockwork_mem_free( URDAI_MemObject *mem_object )
 	free(mem_object);
 
 	URDAI_Status status;
-
 	status.status_code = URDAI_OK;
-	status.async_handle.id.value = 0;
+
 	return status;
 }
 
 static URDAI_Status clockwork_mem_copy( URDAI_MemObject *src, URDAI_MemObject *dest )
 {
+
+	// need to allocate same host_ptr space as original if host_ptr is unassigned.
 	memcpy(dest, src, sizeof(URDAI_MemObject));
 
 	URDAI_Status status;
-
 	status.status_code = URDAI_OK;
-	status.async_handle.id.value = 0;
+
+	return status;
+}
+
+URDAI_Status memcpy_helper( URDAI_MemObject *src, URDAI_MemObject *dest )
+{
+	memcpy(dest, src, sizeof(URDAI_MemObject));
+
+	URDAI_Status status;
+	status.status_code = URDAI_SYNCHRONIZED;
+
 	return status;
 }
 
 static URDAI_Status clockwork_mem_copy_async( URDAI_MemObject *src, URDAI_MemObject *dest )
 {
-	asyncFutures.push_back(std::async(memcpy, dest, src, sizeof(URDAI_MemObject)));
+	asyncStatuses.push_back( std::async( memcpy_helper, dest, src ) );
 
 	URDAI_Status status;
 	status.status_code = URDAI_UNINITIALIZED;
@@ -117,9 +127,7 @@ static URDAI_Status clockwork_mem_free_crop( URDAI_MemObject *cropped_mem_object
 	free(cropped_mem_object);
 
 	URDAI_Status status;
-
 	status.status_code = URDAI_OK;
-	status.async_handle.id.value = 0;
 
 	return status;
 }
@@ -191,7 +199,7 @@ static URDAI_Status run_clockwork_device( URDAI_Device *device,
 	return status;
 }
 
-void* run_clockwork_device_async_helper( URDAI_Device *device,
+URDAI_Status run_clockwork_device_async_helper( URDAI_Device *device,
 												URDAI_MemObject *mem_object_list )
 {
 	Buffer<uint8_t> input(64, 64);
@@ -207,25 +215,27 @@ void* run_clockwork_device_async_helper( URDAI_Device *device,
 	cout << (int) output(0, 0) << endl;	
 
 	std::cout << "Ran " << "conv_3_3 " << "async" << " on " << "clockwork" << "\n";
+
+	URDAI_Status status;
+	status.status_code = URDAI_SYNCHRONIZED;
+	return status;
 }
 
 static URDAI_Status run_clockwork_device_async( URDAI_Device *device, 
 												URDAI_MemObject *mem_object_list )
 {
-	asyncFutures.push_back( std::async( run_clockwork_device_async_helper, device, mem_object_list ));
+	asyncStatuses.push_back( std::async( run_clockwork_device_async_helper, device, mem_object_list ));
+
 	URDAI_Status status;
 	status.status_code = URDAI_OK;
-	return status;
+	status.async_handle.id.value = async_id;
+	status.async_handle.platform = device->platform;
+	async_id++;	return status;
 }
 
 static URDAI_Status clockwork_sync( URDAI_AsyncHandle *async_handle )
 {
-	asyncFutures[async_handle->id.value - 1].get();
-
-	URDAI_Status status;
-	status.status_code = URDAI_OK;
-
-	return status;
+	return asyncStatuses[async_handle->id.value - 1].get();
 }
 
 #ifdef __cplusplus
@@ -276,19 +286,78 @@ URDAI_MemObject* initialize_mem_object_list(URDAI_MemObject* input, URDAI_MemObj
 	return mem_obj_list;
 }
 
+void URDAI_clockwork_run_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
+{
+	URDAI_Status curr_status;
+	// Launch platform
+	URDAI_Platform* clockwork_platform = Clockwork_URDAI_Ops.platform_create();
+	// convert input and output to MemObjects
+	URDAI_MemObject* URDAI_input = load_halide_buffer_to_mem_object(clockwork_platform, 
+																	input, input.size_in_bytes());
+	URDAI_MemObject* URDAI_output = load_halide_buffer_to_mem_object(clockwork_platform, 
+																	 output, output.size_in_bytes());
+	URDAI_MemObject* mem_obj_list = initialize_mem_object_list(URDAI_input, URDAI_output);
+
+	curr_status = run_clockwork_device(clockwork_platform->device_list, mem_obj_list);
+	// Free memory
+	free(mem_obj_list);
+	Clockwork_URDAI_Ops.mem_free(URDAI_input);
+	Clockwork_URDAI_Ops.mem_free(URDAI_output);
+	
+	Clockwork_URDAI_Ops.platform_destroy(clockwork_platform);
+} 
+
+void URDAI_clockwork_run_async_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
+{
+	URDAI_Status curr_status;
+	URDAI_Status async_status;
+	// Launch platform
+	URDAI_Platform* clockwork_platform = Clockwork_URDAI_Ops.platform_create();
+	// convert input and output to MemObjects
+	URDAI_MemObject* URDAI_input = load_halide_buffer_to_mem_object(clockwork_platform, 
+																	input, input.size_in_bytes());
+	URDAI_MemObject* URDAI_output = load_halide_buffer_to_mem_object(clockwork_platform, 
+																	 output, output.size_in_bytes());
+	URDAI_MemObject* mem_obj_list = initialize_mem_object_list(URDAI_input, URDAI_output);
+
+	async_status = run_clockwork_device_async(clockwork_platform->device_list, mem_obj_list);
+	URDAI_AsyncHandle* handle = &async_status.async_handle;
+
+	curr_status = run_clockwork_device(clockwork_platform->device_list, mem_obj_list);
+
+	curr_status = clockwork_sync(handle);
+	cout << "Status Code: " << curr_status.status_code << endl;
+
+	// Free memory
+	free(mem_obj_list);
+	Clockwork_URDAI_Ops.mem_free(URDAI_input);
+	Clockwork_URDAI_Ops.mem_free(URDAI_output);
+	
+	Clockwork_URDAI_Ops.platform_destroy(clockwork_platform);
+} 
+
+void URDAI_clockwork_copy_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
+{
+	URDAI_Status curr_status;
+	// Launch platform
+	URDAI_Platform* clockwork_platform = Clockwork_URDAI_Ops.platform_create();
+	// convert input and output to MemObjects
+	URDAI_MemObject* original = load_halide_buffer_to_mem_object(clockwork_platform, 
+																	input, input.size_in_bytes());
+	URDAI_MemObject* copy;
+
+	curr_status = Clockwork_URDAI_Ops.mem_copy(original, copy);
+
+}
+
 int main( int argc, char *argv[] )
 {
-	URDAI_Platform* clockwork_platform = Clockwork_URDAI_Ops.platform_create();
-
 	Buffer<uint8_t> input = load_and_convert_image((std::string) argv[1]);
 	Buffer<uint8_t> output(62,62);
 
-	URDAI_MemObject* URDAI_input = load_halide_buffer_to_mem_object(clockwork_platform, 
-																	input, input.size_in_bytes());
-	URDAI_MemObject* URDAI_output = load_halide_buffer_to_mem_object(clockwork_platform, output, output.size_in_bytes());
-	
-	URDAI_MemObject* mem_obj_list = initialize_mem_object_list(URDAI_input, URDAI_output);
+	//URDAI_clockwork_run_test(input, output);
 
-	run_clockwork_device(clockwork_platform->device_list, mem_obj_list);
+	//URDAI_clockwork_run_async_test(input, output);
 
+	URDAI_clockwork_copy_test(input, output);
 }
