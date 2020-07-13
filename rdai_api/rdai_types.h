@@ -100,6 +100,7 @@ typedef enum RDAI_StatusCode
     RDAI_INITIALIZED                   = 1,
     RDAI_UNINITIALIZED                 = 2,
     RDAI_OK                            = 3,
+    RDAI_SYNCHRONIZED                  = 4,
 } RDAI_StatusCode;
 
 /**
