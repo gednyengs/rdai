@@ -3,21 +3,22 @@
 #include <vector>
 #include <stdlib.h>
 #include <string.h>
-#include "../rdai_api/rdai_types.h"
+#include "rdai_types.h"
 
 #include "HalideBuffer.h"
 #include "halide_image_io.h"
 #include "clockwork_testscript.cpp"
-#include "unoptimized_conv_3_3.cpp"
+
 
 using namespace Halide::Tools;
 using namespace Halide::Runtime;
+using namespace std;
 
 static uint32_t hardware_id = 1;
 static RDAI_ID urdai_id = {hardware_id};
 static RDAI_VLNV urdai_vlnv;
 
-static std::vector< std::future<RDAI_Status> > asyncStatuses;
+static vector<future<RDAI_Status> > asyncStatuses;
 static uint32_t async_id = 1;
 
 /**
@@ -95,7 +96,7 @@ RDAI_Status memcpy_helper( RDAI_MemObject *src, RDAI_MemObject *dest )
 
 static RDAI_Status clockwork_mem_copy_async( RDAI_MemObject *src, RDAI_MemObject *dest )
 {
-	asyncStatuses.push_back( std::async( memcpy_helper, dest, src ) );
+	asyncStatuses.push_back( async( memcpy_helper, dest, src ) );
 
 	RDAI_Status status;
 	status.status_code = RDAI_UNINITIALIZED;
@@ -134,6 +135,8 @@ static RDAI_Status clockwork_mem_free_crop( RDAI_MemObject *cropped_mem_object )
 	return status;
 }
 
+
+// NEED TO MODIFY
 static RDAI_Platform* clockwork_platform_create( void )
 {
 	RDAI_Platform *platform = (RDAI_Platform *) malloc(sizeof(RDAI_Platform));
@@ -184,19 +187,24 @@ static RDAI_Status clockwork_device_deinit( RDAI_Device *device, void *user_data
 static RDAI_Status run_clockwork_device( RDAI_Device *device, 
 										  RDAI_MemObject **mem_object_list )
 {
-	Buffer<uint8_t> input(64, 64);
-	memcpy(input.begin(), (*mem_object_list)->host_ptr, (*mem_object_list)->size);
+	// Buffer<uint8_t> input(64, 64);
+	// memcpy(input.begin(), (*mem_object_list)->host_ptr, (*mem_object_list)->size);
+	// Buffer<uint8_t> output(62, 62);
+
+	// run_clockwork_program(input, output);
+	// memcpy(mem_object_list[1]->host_ptr, output.begin(), mem_object_list[1]->size);
+
+	run_clockwork_program(mem_object_list);
+
 	Buffer<uint8_t> output(62, 62);
-
-	run_clockwork_program(input, output);
-	memcpy(mem_object_list[1]->host_ptr, output.begin(), mem_object_list[1]->size);
-
-	std::string output_filename = "output_conv_3_3.png";
+	memcpy(output.begin(), mem_object_list[1]->host_ptr, mem_object_list[1]->size);
+	
+	string output_filename = "output_conv_3_3.png";
 	convert_and_save_image(output, output_filename);
 	cout << "First pixel of output..." << endl;
 	cout << (int) output(0, 0) << endl;	
 
-	std::cout << "Ran " << "conv_3_3" << " on " << "clockwork" << "\n";
+	cout << "Ran " << "conv_3_3" << " on " << "clockwork" << "\n";
 
 	RDAI_Status status;
 	status.status_code = RDAI_OK;
@@ -206,19 +214,24 @@ static RDAI_Status run_clockwork_device( RDAI_Device *device,
 RDAI_Status run_clockwork_device_async_helper( RDAI_Device *device,
 												RDAI_MemObject **mem_object_list )
 {
-	Buffer<uint8_t> input(64, 64);
-	memcpy(input.begin(), (*mem_object_list)->host_ptr, (*mem_object_list)->size);
+	// Buffer<uint8_t> input(64, 64);
+	// memcpy(input.begin(), (*mem_object_list)->host_ptr, (*mem_object_list)->size);
+	// Buffer<uint8_t> output(62, 62);
+
+	// run_clockwork_program(input, output);
+	// memcpy(mem_object_list[1]->host_ptr, output.begin(), mem_object_list[1]->size);
+
+	run_clockwork_program(mem_object_list);
+
 	Buffer<uint8_t> output(62, 62);
+	memcpy(output.begin(), mem_object_list[1]->host_ptr, mem_object_list[1]->size);
 
-	run_clockwork_program(input, output);
-	memcpy(mem_object_list[1]->host_ptr, output.begin(), mem_object_list[1]->size);
-
-	std::string output_filename = "output_conv_3_3_async.png";
+	string output_filename = "output_conv_3_3_async.png";
 	convert_and_save_image(output, output_filename);
 	cout << "First pixel of output..." << endl;
 	cout << (int) output(0, 0) << endl;	
 
-	std::cout << "Ran " << "conv_3_3 " << "async" << " on " << "clockwork" << "\n";
+	cout << "Ran " << "conv_3_3 " << "async" << " on " << "clockwork" << "\n";
 
 	RDAI_Status status;
 	status.status_code = RDAI_SYNCHRONIZED;
@@ -228,7 +241,7 @@ RDAI_Status run_clockwork_device_async_helper( RDAI_Device *device,
 static RDAI_Status run_clockwork_device_async( RDAI_Device *device, 
 												RDAI_MemObject **mem_object_list )
 {
-	asyncStatuses.push_back( std::async( run_clockwork_device_async_helper, device, mem_object_list ));
+	asyncStatuses.push_back( async( run_clockwork_device_async_helper, device, mem_object_list ));
 
 	RDAI_Status status;
 	status.status_code = RDAI_OK;
@@ -393,7 +406,7 @@ void RDAI_clockwork_copy_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
 	// for visual confirmation
 	Buffer<uint8_t> copy_out(64,64);
 	memcpy(copy_out.begin(), copy->host_ptr, copy->size);
-	std::string output_filename = "output_mem_copy_test.png";
+	string output_filename = "output_mem_copy_test.png";
 	convert_and_save_image(copy_out, output_filename);
 
 	// Free memory
@@ -461,7 +474,7 @@ void RDAI_clockwork_copy_async_test(Buffer<uint8_t> input, Buffer<uint8_t> outpu
 	// for visual confirmation
 	Buffer<uint8_t> copy_out(64,64);
 	memcpy(copy_out.begin(), copy->host_ptr, copy->size);
-	std::string output_filename = "output_mem_copy_async_test.png";
+	string output_filename = "output_mem_copy_async_test.png";
 	convert_and_save_image(copy_out, output_filename);
 
 	// Free memory
@@ -520,7 +533,7 @@ void RDAI_clockwork_crop_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
 	// for visual confirmation
 	Buffer<uint8_t> crop_out(64,32);
 	memcpy(crop_out.begin(), crop->host_ptr, crop->size);
-	std::string output_filename = "output_mem_crop_test.png";
+	string output_filename = "output_mem_crop_test.png";
 	convert_and_save_image(crop_out, output_filename);
 
 	// Free memory
@@ -531,10 +544,10 @@ void RDAI_clockwork_crop_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
 
 int main( int argc, char *argv[] )
 {
-	Buffer<uint8_t> input = load_and_convert_image((std::string) argv[1]);
+	Buffer<uint8_t> input = load_and_convert_image((string) argv[1]);
 	Buffer<uint8_t> output(62,62);
 
-	//RDAI_clockwork_run_test(input, output);
+	RDAI_clockwork_run_test(input, output);
 
 	//RDAI_clockwork_run_async_test(input, output);
 
@@ -542,5 +555,5 @@ int main( int argc, char *argv[] )
 
 	//RDAI_clockwork_copy_async_test(input, output);
 
-	RDAI_clockwork_crop_test(input, output);
+	//RDAI_clockwork_crop_test(input, output);
 }
