@@ -89,19 +89,31 @@ typedef enum RDAI_Property
  *
  * This enum captures all the status codes supported.
  *
- * @RDAI_UNKNOWN_STATUS_CODE: specifies an unknown status code 
- * @RDAI_INITIALIZED: specifies that an entity is initialized and ready to be used
- * @RDAI_UNINITIALIZED: specifies that an entity is not initialized and
- *                       therefore isn't ready for use
+ * @RDAI_STATUS_OK : Generic Success Code
+ * @RDAI_STATUS_ERROR : Generic Error Code
  */
 typedef enum RDAI_StatusCode
 {
-    RDAI_UNKNOWN_STATUS_CODE           = 0,
-    RDAI_INITIALIZED                   = 1,
-    RDAI_UNINITIALIZED                 = 2,
-    RDAI_OK                            = 3,
-    RDAI_SYNCHRONIZED                  = 4,
+    RDAI_STATUS_OK                     = 0,
+    RDAI_STATUS_ERROR                  = 1,
+
 } RDAI_StatusCode;
+
+/**
+ * RDAI Status Error Reason
+ *
+ * This enum captures all the codes associated with status error reasons.
+ *
+ */
+typedef enum RDAI_ErrorReason
+{
+    RDAI_REASON_NO_PLATFORM             = 0,
+    RDAI_REASON_NO_PLATFORM_OPS         = 1,
+    RDAI_REASON_UNIMPLEMENTED           = 2,
+    RDAI_REASON_INVALID_OBJECT          = 3,
+    RDAI_REASON_INVALID_BUFFER_COUNT    = 4,
+
+} RDAI_ErrorReason;
 
 /**
  * RDAI Handle for Asynchronous Calls
@@ -126,12 +138,14 @@ typedef struct RDAI_AsyncHandle
  * and asynchronous API calls
  *
  * @status_code: the returned status code from an API call
+ * @error_reason: the returned error reason from an API call
  * @async_handle: If an async API call is made, async_handle will contain
  *                synchronization info
  */
 typedef struct RDAI_Status
 {
     RDAI_StatusCode status_code;
+    RDAI_ErrorReason error_reason;
     RDAI_AsyncHandle async_handle;
 
 } RDAI_Status;
