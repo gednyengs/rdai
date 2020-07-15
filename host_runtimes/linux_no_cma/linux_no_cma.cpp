@@ -16,22 +16,19 @@
  * under the License.
  */
 
-#ifndef RDAI_API_H
-#define RDAI_API_H
+#include "linux_no_cma_impl.h"
 
-#include <stdlib.h>
-#include "rdai_types.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
+static RDAI_Platform_Impl impl;
 
 /**
  * Get all platforms registered with the runtime
  *
  * @return NULL-terminated list of RDAI_Platform pointers
  */
-RDAI_Platform **RDAI_get_all_platforms( void );
+RDAI_Platform **RDAI_get_all_platforms( void )
+{
+    return impl.get_all_platforms();
+}
 
 /**
  * Get all platforms of a given type registered with the runtime
@@ -39,7 +36,10 @@ RDAI_Platform **RDAI_get_all_platforms( void );
  * @param platform_type The type of platforms to retrieve
  * @return NULL-terminated list of RDAI_Platform pointers
  */
-RDAI_Platform **RDAI_get_platforms_with_type( const RDAI_PlatformType *platform_type );
+RDAI_Platform **RDAI_get_platforms_with_type( const RDAI_PlatformType *platform_type )
+{
+    return impl.get_platforms_with_type( platform_type );
+}
 
 /**
  * Get platforms with a certain property
@@ -47,7 +47,10 @@ RDAI_Platform **RDAI_get_platforms_with_type( const RDAI_PlatformType *platform_
  * @param property The property to use in the search for platforms
  * @return NULL-terminated list of RDAI_Platform pointers
  */
-RDAI_Platform **RDAI_get_platforms_with_property( const RDAI_Property *property );
+RDAI_Platform **RDAI_get_platforms_with_property( const RDAI_Property *property )
+{
+    return impl.get_platforms_with_property( property );
+}
 
 /**
  * Get platforms with certain properties
@@ -55,7 +58,10 @@ RDAI_Platform **RDAI_get_platforms_with_property( const RDAI_Property *property 
  * @param property_list NULL-terminated list of RDAI_Property pointers to use in the search for platforms
  * @return NULL-terminated list of RDAI_Platform pointers
  */
-RDAI_Platform **RDAI_get_platforms_with_properties( const RDAI_Property **property_list );
+RDAI_Platform **RDAI_get_platforms_with_properties( const RDAI_Property **property_list )
+{
+    return impl.get_platforms_with_properties( property_list );
+}
 
 /**
  * Get a platform with a given ID
@@ -63,7 +69,10 @@ RDAI_Platform **RDAI_get_platforms_with_properties( const RDAI_Property **proper
  * @param platform_id The ID of the platform to search for
  * @return The retrieved platform pointer or NULL
  */
-RDAI_Platform *RDAI_get_platform_with_id( const RDAI_ID * platform_id );
+RDAI_Platform *RDAI_get_platform_with_id( const RDAI_ID * platform_id )
+{
+    return impl.get_platform_with_id( platform_id );
+}
 
 /**
  * Free a list returned through one the RDAI_get_platforms_**
@@ -71,7 +80,10 @@ RDAI_Platform *RDAI_get_platform_with_id( const RDAI_ID * platform_id );
  * @param platform_list The list to free
  * @return status
  */
-RDAI_Status RDAI_free_platform_list( RDAI_Platform **platform_list );
+RDAI_Status RDAI_free_platform_list( RDAI_Platform **platform_list )
+{
+    return impl.free_platform_list( platform_list );
+}
 
 /**
  * Get all devices in a platform
@@ -79,7 +91,10 @@ RDAI_Status RDAI_free_platform_list( RDAI_Platform **platform_list );
  * @param platform The platform to search devices in
  * @return NULL-terminated list of RDAI_Device pointers
  */
-RDAI_Device **RDAI_get_all_devices( const RDAI_Platform *platform );
+RDAI_Device **RDAI_get_all_devices( const RDAI_Platform *platform )
+{
+    return impl.get_all_devices( platform );
+}
 
 /**
  * Get all devices in a platform with the specified VLNV
@@ -88,7 +103,10 @@ RDAI_Device **RDAI_get_all_devices( const RDAI_Platform *platform );
  * @param device_vlnv The VLNV to use in the device search
  * @return NULL-terminated list of RDAI_Device pointers
  */
-RDAI_Device **RDAI_get_devices_with_vlnv( const RDAI_Platform *platform, const RDAI_VLNV *device_vlnv );
+RDAI_Device **RDAI_get_devices_with_vlnv( const RDAI_Platform *platform, const RDAI_VLNV *device_vlnv )
+{
+    return impl.get_devices_with_vlnv( platform, device_vlnv );
+}
 
 /**
  * Get all devices with a specific property
@@ -97,7 +115,10 @@ RDAI_Device **RDAI_get_devices_with_vlnv( const RDAI_Platform *platform, const R
  * @property The property to use in the search
  * @return NULL-terminated list of RDAI_Device pointers
  */
-RDAI_Device **RDAI_get_devices_with_property( const RDAI_Platform *platform, const RDAI_Property *property );
+RDAI_Device **RDAI_get_devices_with_property( const RDAI_Platform *platform, const RDAI_Property *property )
+{
+    return impl.get_devices_with_property( platform, property );
+}
 
 /**
  * Get all devices with the specified properties
@@ -106,7 +127,10 @@ RDAI_Device **RDAI_get_devices_with_property( const RDAI_Platform *platform, con
  * @param property_list NULL-terminated list of RDAI_Property pointers to use in the search for devices
  * @return NULL-terminated list of RDAI_Device pointers
  */
-RDAI_Device **RDAI_get_devices_with_properties( const RDAI_Platform *platform, const RDAI_Property **property_list );
+RDAI_Device **RDAI_get_devices_with_properties( const RDAI_Platform *platform, const RDAI_Property **property_list )
+{
+    return impl.get_devices_with_properties( platform, property_list );
+}
 
 /**
  * Get a device with a specific ID
@@ -115,7 +139,10 @@ RDAI_Device **RDAI_get_devices_with_properties( const RDAI_Platform *platform, c
  * @param device_id The device ID to use in the search for devices
  * @return The retrieved device pointer or NULL
  */
-RDAI_Device *RDAI_get_device_with_id( const RDAI_Platform *platform, const RDAI_ID *device_id );
+RDAI_Device *RDAI_get_device_with_id( const RDAI_Platform *platform, const RDAI_ID *device_id )
+{
+    return impl.get_device_with_id( platform, device_id );
+}
 
 /**
  * Free a list returned through one the RDAI_get_devices_**
@@ -123,7 +150,10 @@ RDAI_Device *RDAI_get_device_with_id( const RDAI_Platform *platform, const RDAI_
  * @param device_list The list to free
  * @return status
  */
-RDAI_Status RDAI_free_device_list( RDAI_Device **device_list );
+RDAI_Status RDAI_free_device_list( RDAI_Device **device_list )
+{
+    return impl.free_device_list( device_list );
+}
 
 /**
  * Check whether a platform has the specified property
@@ -132,7 +162,10 @@ RDAI_Status RDAI_free_device_list( RDAI_Device **device_list );
  * @param property The property to search for in the given platform
  * @return 0 if the platform does not have the specified property, non-zero otherwise
  */
-int RDAI_platform_has_property( const RDAI_Platform *platform, const RDAI_Property *property );
+int RDAI_platform_has_property( const RDAI_Platform *platform, const RDAI_Property *property )
+{
+    return impl.platform_has_property( platform, property );
+}
 
 /**
  * Check whether a platform has the specified properties
@@ -141,7 +174,10 @@ int RDAI_platform_has_property( const RDAI_Platform *platform, const RDAI_Proper
  * @param property_list NULL-terminated list of RDAI_Property pointers to search for in the given platform
  * @return 0 if the platform does not have the specified properties, non-zero otherwise
  */
-int RDAI_platform_has_properties( const RDAI_Platform *platform, const RDAI_Property **property_list );
+int RDAI_platform_has_properties( const RDAI_Platform *platform, const RDAI_Property **property_list )
+{
+    return impl.platform_has_properties( platform, property_list );
+}
 
 /**
  * Check whether a device has the specified property
@@ -150,7 +186,10 @@ int RDAI_platform_has_properties( const RDAI_Platform *platform, const RDAI_Prop
  * @param property The property to search for in the given device
  * @return 0 if the device does not have the specified property, non-zero otherwise
  */
-int RDAI_device_has_property( const RDAI_Device *device, const RDAI_Property *property );
+int RDAI_device_has_property( const RDAI_Device *device, const RDAI_Property *property )
+{
+    return impl.device_has_property( device, property );
+}
 
 /**
  * Check whether a device has the specified properties
@@ -159,7 +198,10 @@ int RDAI_device_has_property( const RDAI_Device *device, const RDAI_Property *pr
  * @param property_list NULL-terminated list of RDAI_Property pointers to search for in the given device
  * @return 0 if the device does not have the specified properties, non-zero otherwise
  */
-int RDAI_device_has_properties( const RDAI_Device *device, const RDAI_Property *property_list );
+int RDAI_device_has_properties( const RDAI_Device *device, const RDAI_Property **property_list )
+{
+    return impl.device_has_properties( device, property_list );
+}
 
 /**
  * Register a platform with the runtime
@@ -167,7 +209,10 @@ int RDAI_device_has_properties( const RDAI_Device *device, const RDAI_Property *
  * @param platform_ops RDAI interface implementation for the platform to register
  * @return The registered platform or NULL
  */
-RDAI_Platform *RDAI_register_platform( RDAI_PlatformOps *platform_ops );
+RDAI_Platform *RDAI_register_platform( RDAI_PlatformOps *platform_ops )
+{
+    return impl.register_platform( platform_ops );
+}
 
 /**
  * Unregister a platform from the runtime
@@ -175,7 +220,10 @@ RDAI_Platform *RDAI_register_platform( RDAI_PlatformOps *platform_ops );
  * @param platform The platform to unregister
  * @return status
  */
-RDAI_Status RDAI_unregister_platform( RDAI_Platform *platform );
+RDAI_Status RDAI_unregister_platform( RDAI_Platform *platform )
+{
+    return impl.unregister_platform( platform );
+}
 
 /**
  * Allocate a RDAI_MEM_HOST memory object
@@ -183,7 +231,10 @@ RDAI_Status RDAI_unregister_platform( RDAI_Platform *platform );
  * @param size The allocation size in bytes
  * @return The allocated memory object or NULL
  */
-RDAI_MemObject *RDAI_mem_host_allocate( size_t size );
+RDAI_MemObject *RDAI_mem_host_allocate( size_t size )
+{
+    return impl.mem_host_allocate( size );
+}
 
 /**
  * Allocate a RDAI_MEM_DEVICE memory object
@@ -192,7 +243,10 @@ RDAI_MemObject *RDAI_mem_host_allocate( size_t size );
  * @param size The allocation size in bytes
  * @return The allocated memory object or NULL
  */
-RDAI_MemObject *RDAI_mem_device_allocate( RDAI_Device *device, size_t size );
+RDAI_MemObject *RDAI_mem_device_allocate( RDAI_Device *device, size_t size )
+{
+    return impl.mem_device_allocate( device, size );
+}
 
 /**
  * Allocate a RDAI_MEM_SHARED memory object
@@ -200,7 +254,10 @@ RDAI_MemObject *RDAI_mem_device_allocate( RDAI_Device *device, size_t size );
  * @param size The allocation size in bytes
  * @return The allocated memory object or NULL
  */
-RDAI_MemObject *RDAI_mem_shared_allocate( size_t size );
+RDAI_MemObject *RDAI_mem_shared_allocate( size_t size )
+{
+    return impl.mem_shared_allocate( size );
+}
 
 /**
  * Free a memory object
@@ -208,7 +265,10 @@ RDAI_MemObject *RDAI_mem_shared_allocate( size_t size );
  * @param mem_object The memory object to free
  * @return status
  */
-RDAI_Status RDAI_mem_free( RDAI_MemObject *mem_object );
+RDAI_Status RDAI_mem_free( RDAI_MemObject *mem_object )
+{
+    return impl.mem_free( mem_object );
+}
 
 /**
  * Synchronous copy from a memory object to another
@@ -220,7 +280,10 @@ RDAI_Status RDAI_mem_free( RDAI_MemObject *mem_object );
  * @param dest The destination memory object
  * @return status
  */
-RDAI_Status RDAI_mem_copy( RDAI_MemObject *src, RDAI_MemObject *dest );
+RDAI_Status RDAI_mem_copy( RDAI_MemObject *src, RDAI_MemObject *dest )
+{
+    return impl.mem_copy( src, dest );
+}
 
 /**
  * Asynchronous copy from a memory object to another
@@ -232,7 +295,10 @@ RDAI_Status RDAI_mem_copy( RDAI_MemObject *src, RDAI_MemObject *dest );
  * @param dest The destination memory object
  * @return status (with async handle)
  */
-RDAI_Status RDAI_mem_copy_async( RDAI_MemObject *src, RDAI_MemObject *dest );
+RDAI_Status RDAI_mem_copy_async( RDAI_MemObject *src, RDAI_MemObject *dest )
+{
+    return impl.mem_copy_async( src, dest );
+}
 
 /**
  * Create a cropped/sliced view of a memory object
@@ -245,7 +311,10 @@ RDAI_Status RDAI_mem_copy_async( RDAI_MemObject *src, RDAI_MemObject *dest );
  * @param crop_size The size in bytes of the resulting cropped memory object
  * @return The cropped memory object or NULL
  */
-RDAI_MemObject *RDAI_mem_crop( RDAI_MemObject *src, size_t offset, size_t crop_size );
+RDAI_MemObject *RDAI_mem_crop( RDAI_MemObject *src, size_t offset, size_t crop_size )
+{
+    return impl.mem_crop( src, offset, crop_size );
+}
 
 /**
  * Free a cropped/sliced view
@@ -253,7 +322,10 @@ RDAI_MemObject *RDAI_mem_crop( RDAI_MemObject *src, size_t offset, size_t crop_s
  * @param cropped_mem_object The cropped view to free
  * @return status
  */
-RDAI_Status RDAI_mem_free_crop( RDAI_MemObject *cropped_mem_object );
+RDAI_Status RDAI_mem_free_crop( RDAI_MemObject *cropped_mem_object )
+{
+    return impl.mem_free_crop( cropped_mem_object );
+}
 
 /**
  * Initialize a hardware platform
@@ -264,7 +336,10 @@ RDAI_Status RDAI_mem_free_crop( RDAI_MemObject *cropped_mem_object );
  * @param user_data Platform-dependent initialization context/data (opaque pointer)
  * @return status
  */
-RDAI_Status RDAI_platform_init( RDAI_Platform *platform, void *user_data );
+RDAI_Status RDAI_platform_init( RDAI_Platform *platform, void *user_data )
+{
+    return impl.platform_init( platform, user_data );
+}
 
 /**
  * Deinitialize a hardware platform
@@ -275,7 +350,10 @@ RDAI_Status RDAI_platform_init( RDAI_Platform *platform, void *user_data );
  * @param user_data Platform-dependent context/data (opaque pointer)
  * @return status
  */
-RDAI_Status RDAI_platform_deinit( RDAI_Platform *platform, void *user_data );
+RDAI_Status RDAI_platform_deinit( RDAI_Platform *platform, void *user_data )
+{
+    return impl.platform_deinit( platform, user_data );
+}
 
 /**
  * Initialize an accelerator device
@@ -286,7 +364,10 @@ RDAI_Status RDAI_platform_deinit( RDAI_Platform *platform, void *user_data );
  * @param user_data Device-dependent context/data (opaque pointer)
  * @return status
  */
-RDAI_Status RDAI_device_init( RDAI_Device *device, void *user_data );
+RDAI_Status RDAI_device_init( RDAI_Device *device, void *user_data )
+{
+    return impl.device_init( device, user_data );
+}
 
 /**
  * Deinitialize an accelerator device
@@ -297,7 +378,10 @@ RDAI_Status RDAI_device_init( RDAI_Device *device, void *user_data );
  * @param user_data Device-dependent context/data (opaque pointer)
  * @return status
  */
-RDAI_Status RDAI_device_deinit( RDAI_Device *device, void *user_data );
+RDAI_Status RDAI_device_deinit( RDAI_Device *device, void *user_data )
+{
+    return impl.device_deinit( device, user_data );
+}
 
 /**
  * Synchronously run an accelerator device
@@ -310,7 +394,10 @@ RDAI_Status RDAI_device_deinit( RDAI_Device *device, void *user_data );
  *
  * NOTE: The positional meaning of the input memory objects is device-dependent
  */
-RDAI_Status RDAI_device_run( RDAI_Device *device, RDAI_MemObject **mem_object_list );
+RDAI_Status RDAI_device_run( RDAI_Device *device, RDAI_MemObject **mem_object_list )
+{
+    return impl.device_run( device, mem_object_list );
+}
 
 /**
  * Asynchronously run an accelerator device
@@ -323,7 +410,10 @@ RDAI_Status RDAI_device_run( RDAI_Device *device, RDAI_MemObject **mem_object_li
  *
  * NOTE: The positional meaning of the input memory objects is device-dependent
  */
-RDAI_Status RDAI_device_run_async( RDAI_Device *device, RDAI_MemObject **mem_object_list );
+RDAI_Status RDAI_device_run_async( RDAI_Device *device, RDAI_MemObject **mem_object_list )
+{
+    return impl.device_run_async( device, mem_object_list);
+}
 
 /**
  * Synchronize execution for an async call
@@ -331,9 +421,8 @@ RDAI_Status RDAI_device_run_async( RDAI_Device *device, RDAI_MemObject **mem_obj
  * @param async_handle The handle to the async call to synchronize
  * @return status
  */
-RDAI_Status RDAI_sync( RDAI_AsyncHandle *async_handle );
-
-#ifdef __cplusplus
+RDAI_Status RDAI_sync( RDAI_AsyncHandle *async_handle )
+{
+    return impl.sync( async_handle );
 }
-#endif // __cplusplus
-#endif // RDAI_API_H
+
