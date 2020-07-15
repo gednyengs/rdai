@@ -7,7 +7,7 @@
 
 #include "HalideBuffer.h"
 #include "halide_image_io.h"
-#include "clockwork_testscript.cpp"
+#include "clockwork_testscript.h"
 
 
 using namespace Halide::Tools;
@@ -198,7 +198,7 @@ static RDAI_Status run_clockwork_device( RDAI_Device *device,
 
 	Buffer<uint8_t> output(62, 62);
 	memcpy(output.begin(), mem_object_list[1]->host_ptr, mem_object_list[1]->size);
-	
+
 	string output_filename = "output_conv_3_3.png";
 	convert_and_save_image(output, output_filename);
 	cout << "First pixel of output..." << endl;
