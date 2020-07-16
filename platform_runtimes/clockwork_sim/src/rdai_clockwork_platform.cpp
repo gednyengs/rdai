@@ -22,15 +22,14 @@
 
 /* Other includes */
 #include "rdai_api.h"
+
 #include <iostream>
 #include <future>
 #include <vector>
-#include <stdlib.h>
 #include <string.h>
 
 #include "HalideBuffer.h"
 #include "halide_image_io.h"
-#include "clockwork_sim_platform.h"
 
 using namespace Halide::Tools;
 using namespace Halide::Runtime;
@@ -131,13 +130,12 @@ static RDAI_Status op_mem_copy( RDAI_MemObject *src, RDAI_MemObject *dest )
 	memcpy(dest->host_ptr, src->host_ptr, src->size);
 	dest->device_ptr	= src->device_ptr;
 	dest->size 			= src->size;
-
 	return make_status_ok();
 }
 
 static RDAI_Status op_mem_copy_async( RDAI_MemObject *src, RDAI_MemObject *dest )
 {
-	asyncStatuses.push_back( async( clockwork_mem_copy, dest, src ) );
+	asyncStatuses.push_back( async( op_mem_copy, src, dest ) );
 	return make_status_ok_async();
 }
 
@@ -214,23 +212,18 @@ static RDAI_Status op_device_deinit( RDAI_Device *device, void *user_data )
 static RDAI_Status op_device_run( RDAI_Device *device, 
 								  RDAI_MemObject **mem_object_list )
 {
-	// Buffer<uint8_t> input(64, 64);
-	// memcpy(input.begin(), (*mem_object_list)->host_ptr, (*mem_object_list)->size);
-	// Buffer<uint8_t> output(62, 62);
+	if( device && mem_object_list && mem_object_list[0] ) {
+		run_clockwork_program(mem_object_list);
 
-	// run_clockwork_program(input, output);
-	// memcpy(mem_object_list[1]->host_ptr, output.begin(), mem_object_list[1]->size);
+		Buffer<uint8_t> output(62, 62);
+		memcpy(output.begin(), mem_object_list[1]->host_ptr, mem_object_list[1]->size);
 
-	run_clockwork_program(mem_object_list);
-
-	Buffer<uint8_t> output(60, 60);
-	memcpy(output.begin(), mem_object_list[1]->host_ptr, mem_object_list[1]->size);
-
-	string output_filename = "output_unsharp.png";
-	convert_and_save_image(output, output_filename);
-	cout << "First pixel of output..." << endl;
-	cout << (int) output(0, 0) << endl;	
-	cout << "Ran " << "unsharp" << " on " << "clockwork" << "\n";
+		string output_filename = "output/output_conv_3_3.png";
+		convert_and_save_image(output, output_filename);
+		cout << "First pixel of output..." << endl;
+		cout << (int) output(0, 0) << endl;	
+		cout << "Ran " << "conv_3_3" << " on " << "clockwork" << "\n";
+	}
 
 	return make_status_ok();
 }
@@ -238,13 +231,17 @@ static RDAI_Status op_device_run( RDAI_Device *device,
 static RDAI_Status op_device_run_async( RDAI_Device *device, 
 										RDAI_MemObject **mem_object_list )
 {
-	asyncStatuses.push_back( async( run_clockwork_device, device, mem_object_list ));
+	asyncStatuses.push_back( async( op_device_run, device, mem_object_list ));
 	return make_status_ok_async();
 }
 
 static RDAI_Status op_sync( RDAI_AsyncHandle *async_handle )
 {
-	return asyncStatuses[async_handle->id.value - 1].get();
+	if(async_handle && async_handle->platform) {
+        return asyncStatuses[async_handle->id.value - 1].get();
+    }
+    return make_status_error();
+	
 }
 
 // ======================== PlatformOps ========================================
@@ -252,7 +249,7 @@ static RDAI_Status op_sync( RDAI_AsyncHandle *async_handle )
 extern "C" {
 #endif // __cplusplus
 
-struct RDAI_PlatformOps rdai_clockwork_tb_ops = {
+struct RDAI_PlatformOps rdai_clockwork_sim_ops = {
     .mem_allocate       = op_mem_allocate,
     .mem_free           = op_mem_free,
     .mem_copy           = op_mem_copy,
