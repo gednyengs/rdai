@@ -15,6 +15,13 @@ using namespace std;
 #include "rdai_api.h"
 #include "clockwork_sim_platform.h"
 
+int _halide_buffer_get_stride(const halide_buffer_t *buf, int d) {
+    return buf->dim[d].stride;
+}
+uint8_t *_halide_buffer_get_host(const halide_buffer_t *buf) {
+    return buf->host;
+}
+
 
 RDAI_MemObject* load_halide_buffer_to_mem_object(RDAI_Platform* platform, 
 												  Buffer<uint8_t> buffer, size_t size)
@@ -24,17 +31,6 @@ RDAI_MemObject* load_halide_buffer_to_mem_object(RDAI_Platform* platform,
 
 	memcpy(memObject->host_ptr, buffer.begin(), size);
 	return memObject;
-}
-
-RDAI_MemObject** initialize_mem_object_list(RDAI_MemObject* input, RDAI_MemObject* output)
-{
-	RDAI_MemObject** mem_obj_list = (RDAI_MemObject **) malloc(3 * sizeof(RDAI_MemObject*));
-	memcpy(&mem_obj_list[0], &input, sizeof(RDAI_MemObject*));
-	memcpy(&mem_obj_list[1], &output, sizeof(RDAI_MemObject*));
-	// last element must be null
-	memset(&mem_obj_list[2], 0, sizeof(RDAI_MemObject*));
-
-	return mem_obj_list;
 }
 
 void RDAI_clockwork_run_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
@@ -47,11 +43,17 @@ void RDAI_clockwork_run_test(Buffer<uint8_t> input, Buffer<uint8_t> output)
 																	input, input.size_in_bytes());
 	RDAI_MemObject* RDAI_output = load_halide_buffer_to_mem_object(clockwork_platform, 
 																	 output, output.size_in_bytes());
-	RDAI_MemObject** mem_obj_list = initialize_mem_object_list(RDAI_input, RDAI_output);
+	RDAI_MemObject *mem_obj_list[3] = {
+	    RDAI_input,
+	    RDAI_output,
+	    NULL
+	};
 
 	curr_status = rdai_clockwork_sim_ops.device_run(*(clockwork_platform->device_list), mem_obj_list);
+
+	std::cout << "Ran " << "conv_3_3" << " on " << "clockwork" << "\n";
+
 	// Free memory
-	free(mem_obj_list);
 	rdai_clockwork_sim_ops.mem_free(RDAI_input);
 	rdai_clockwork_sim_ops.mem_free(RDAI_output);
 	
@@ -69,7 +71,11 @@ void RDAI_clockwork_run_async_test(Buffer<uint8_t> input, Buffer<uint8_t> output
 																	input, input.size_in_bytes());
 	RDAI_MemObject* RDAI_output = load_halide_buffer_to_mem_object(clockwork_platform, 
 																	 output, output.size_in_bytes());
-	RDAI_MemObject** mem_obj_list = initialize_mem_object_list(RDAI_input, RDAI_output);
+	RDAI_MemObject *mem_obj_list[3] = {
+	    RDAI_input,
+	    RDAI_output,
+	    NULL
+	};
 
 	async_status = rdai_clockwork_sim_ops.device_run_async(*(clockwork_platform->device_list), mem_obj_list);
 	RDAI_AsyncHandle* handle = &async_status.async_handle;
@@ -81,7 +87,6 @@ void RDAI_clockwork_run_async_test(Buffer<uint8_t> input, Buffer<uint8_t> output
 	cout << "Status Code: " << curr_status.status_code << endl;
 
 	// Free memory
-	free(mem_obj_list);
 	rdai_clockwork_sim_ops.mem_free(RDAI_input);
 	rdai_clockwork_sim_ops.mem_free(RDAI_output);
 	
