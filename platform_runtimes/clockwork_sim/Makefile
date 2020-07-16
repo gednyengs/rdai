@@ -19,6 +19,10 @@ COREIR_CXX_FLAGS = -I $(COREIR_DIR)/include -L$(COREIR_DIR)/lib -Wl,-rpath,$(COR
 COREIR_CXX_FLAGS += -I $(FUNCBUF_DIR)/include -L$(FUNCBUF_DIR)/bin -Wl,-rpath,$(FUNCBUF_DIR)/bin
 CXXFLAGS += $(COREIR_CXX_FLAGS)
 
+# For RDAI API
+RDAI_DIR ?= $(HALIDE_BIN_PATH)/../rdai
+RDAI_CXX_FLAGS = -I$(RDAI_DIR)/rdai_api
+CXXFLAGS += $(RDAI_CXX_FLAGS)
 # For running testbench
 CXX_FLAGS 					+= -I $(APP_BIN)
 RDAI_PLATFORM_CXXFLAGS 		= -I ./include -I$(BIN)

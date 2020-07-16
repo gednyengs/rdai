@@ -23,16 +23,10 @@
 /* Other includes */
 #include "rdai_api.h"
 
-#include <iostream>
 #include <future>
 #include <vector>
 #include <string.h>
 
-#include "HalideBuffer.h"
-#include "halide_image_io.h"
-
-using namespace Halide::Tools;
-using namespace Halide::Runtime;
 using namespace std;
 
 static uint32_t hardware_id = 1;
@@ -166,26 +160,27 @@ static RDAI_Status op_mem_free_crop( RDAI_MemObject *cropped_mem_object )
 
 static RDAI_Platform* op_platform_create( void )
 {
-	RDAI_Platform *platform = (RDAI_Platform *) malloc(sizeof(RDAI_Platform));
+	// RDAI_Platform *platform = (RDAI_Platform *) malloc(sizeof(RDAI_Platform));
 
-	RDAI_Device device = {urdai_id, urdai_vlnv, platform, NULL, 1};
-	RDAI_Device *device_ptr = &device;
-	RDAI_Device **device_list = (RDAI_Device **) malloc(sizeof(RDAI_Device));
-	memcpy(device_list, &device_ptr, sizeof(RDAI_Device*));
+	// RDAI_Device device = {urdai_id, urdai_vlnv, platform, NULL, 1};
+	// RDAI_Device *device_ptr = &device;
+	// RDAI_Device **device_list = (RDAI_Device **) malloc(sizeof(RDAI_Device));
+	// memcpy(device_list, &device_ptr, sizeof(RDAI_Device*));
 
-	RDAI_Platform temp_platform = {RDAI_CLOCKWORK_PLATFORM, urdai_id, NULL, device_list};
+	// RDAI_Platform temp_platform = {RDAI_CLOCKWORK_PLATFORM, urdai_id, NULL, device_list};
 			
-	hardware_id++;
+	// hardware_id++;
 
-	memcpy(platform, &temp_platform, sizeof(RDAI_Platform));
+	// memcpy(platform, &temp_platform, sizeof(RDAI_Platform));
 
-	return platform;
+	// return platform;
+	return &rdai_clockwork_platform;
 }
 
 static RDAI_Status op_platform_destroy( RDAI_Platform *platform )
 {
-	free(platform->device_list);
-	free(platform);
+	// free(platform->device_list);
+	// free(platform);
 	return make_status_ok();
 }
 
@@ -214,15 +209,6 @@ static RDAI_Status op_device_run( RDAI_Device *device,
 {
 	if( device && mem_object_list && mem_object_list[0] ) {
 		run_clockwork_program(mem_object_list);
-
-		Buffer<uint8_t> output(62, 62);
-		memcpy(output.begin(), mem_object_list[1]->host_ptr, mem_object_list[1]->size);
-
-		string output_filename = "output/output_conv_3_3.png";
-		convert_and_save_image(output, output_filename);
-		cout << "First pixel of output..." << endl;
-		cout << (int) output(0, 0) << endl;	
-		cout << "Ran " << "conv_3_3" << " on " << "clockwork" << "\n";
 	}
 
 	return make_status_ok();
