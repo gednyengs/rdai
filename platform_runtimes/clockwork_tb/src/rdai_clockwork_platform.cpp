@@ -60,7 +60,7 @@
 
 static RDAI_MemObject * op_mem_allocate( RDAI_MemObjectType mem_object_type,
                                          size_t size,
-                                         RDAI_Device *device)
+                                         RDAI_Device *device )
 {
     return NULL;
 }
