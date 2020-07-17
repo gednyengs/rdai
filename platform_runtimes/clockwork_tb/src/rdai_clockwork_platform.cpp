@@ -23,7 +23,6 @@
 /* Other includes */
 #include "rdai_api.h"
 
-
 // =================== HELPER FUNCTIONS =================================
 
 /**
@@ -145,7 +144,7 @@ static RDAI_Status op_sync( RDAI_AsyncHandle *handle )
 
 // ======================== PlatformOps ========================================
 
-RDAI_PlatformOps rdai_clockwork_tb_ops = {
+RDAI_PlatformOps rdai_clockwork_sim_ops = {
     .mem_allocate       = op_mem_allocate,
     .mem_free           = op_mem_free,
     .mem_copy           = op_mem_copy,

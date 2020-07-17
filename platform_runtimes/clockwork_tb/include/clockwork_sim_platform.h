@@ -16,11 +16,11 @@
  * under the License.
  */
 
-#ifndef RDAI_CLOCKWORK_TB_PLATFORM_H
-#define RDAI_CLOCKWORK_TB_PLATFORM_H
+#ifndef RDAI_CLOCKWORK_SIM_PLATFORM_H
+#define RDAI_CLOCKWORK_SIM_PLATFORM_H
 
 #include "rdai_api.h"
 
-extern RDAI_PlatformOps rdai_clockwork_tb_ops;
+extern RDAI_PlatformOps rdai_clockwork_sim_ops;
 
-#endif // RDAI_CLOCKWORK_TB_PLATFORM_H
+#endif // RDAI_CLOCKWORK_SIM_PLATFORM_H
