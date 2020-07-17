@@ -3,4 +3,7 @@
 
 ## RDAI Components
 
+<div style='float: center'>
+    <img src="doc/images/RDAI_System.png"></img>
+</div>
 
