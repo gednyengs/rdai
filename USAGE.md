@@ -29,7 +29,7 @@ Here is a list of the different make targets:
      compare-clockwork   # compare Clockwork output file to CPU output image
      eval                # evaluate runtime </code></pre>
 
-The definition of all of these targets can be found in `apps/hardware_benchmarks/hw_support/hardware_targets.mk`.\
+The definition of all of these targets can be found in `apps/hardware_benchmarks/hw_support/hardware_targets.mk`.
 
 ## Halide-to-Hardware Repository Tree:
 <pre><code>Halide-to-Hardware
