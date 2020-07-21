@@ -1,8 +1,10 @@
 # RDAI Usage Instructions
-[What is RDAI?](README.md)
+[What is RDAI?](https://github.com/thenextged/rdai/blob/master/README.md)
 
 ## Installation
-Installation instructions can be found [here](INSTALL.md).
+Clone the `rdai` repo directly outside the halide-to-hardware compiler's top directory (where `clockwork`, `coreir`, and `BufferMapping` dependencies are expected by default).
+
+For a full halide-to-hardware compiler setup on Kiwi (including RDAI), please browse [here](https://github.com/thenextged/rdai/blob/master/INSTALL.md).
 
 ## Applications
 Applications are split into two folders in `Halide-to-Hardware/apps/hardware_benchmarks`:
@@ -10,12 +12,12 @@ Applications are split into two folders in `Halide-to-Hardware/apps/hardware_ben
 - `apps` features more complex applications like resnet.
 
 ## Running the Pipeline
-In order to run an application through the pipeline on a hardware platform, follow these steps:
-1. Change into the application directory: `cd apps/hardware_benchmarks/path/to/app/`
-2. In the Makefile, change `RDAI_PLATFORM_RUNTIME` to the desired platform runtime (e.g. `clockwork_sim`). Available platform runtimes are located in `rdai/platform_runtimes`.
-3. Generate target design: `make compiler && make <design>`
-4. Run input through target design: `make run-<design>`
-5. Compare output to cpu output: `make compare-<design>`
+In order to run a full Halide pipeline with a clockwork target, follow these steps:
+1. From within the halide-to-hardware compiler's top directory, change into the application directory: `cd apps/hardware_benchmarks/path/to/app/`
+2. In the app's Makefile, you can choose the RDAI C-Simulation platform runtime by changing `RDAI_PLATFORM_RUNTIME` to `clockwork_sim`. Available platform runtimes are located in `rdai/platform_runtimes` under the `rdai` repo. Similarly, you can choose a different host runtime by changing/adding the variable `RDAI_HOST_RUNTIME` in the app's Makefile. Available RDAI host runtimes are located at `rdai/host_runtimes` under the `rdai` repo. The default `RDAI_PLATFORM_RUNTIME` and `RDAI_HOST_RUNTIME` setup allows a C-Simulation of the Halide pipeline.
+3. Generate target design: `make compiler && make <TARGET>` where `TARGET` can be `cpu`, `clockwork`, `coreir`, etc.
+4. Run pipeline with implemented hardware kernels: `make run-<TARGET>`
+5. Compare output to cpu output: `make compare-<TARGET>`
 
 Here is a list of the different make targets:
 <pre><code>make clean               # remove generated files (bin directory)
