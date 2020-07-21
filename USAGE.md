@@ -16,8 +16,8 @@ In order to run a full Halide-to-Hardware pipeline, follow these steps:
 1. From within the halide-to-hardware compiler's top directory, change into the application directory: `cd apps/hardware_benchmarks/path/to/app/`
 2. In the app's Makefile, you can choose the RDAI C-Simulation platform runtime by changing `RDAI_PLATFORM_RUNTIME` to `clockwork_sim`. Available platform runtimes are located in `rdai/platform_runtimes` under the `rdai` repo. Similarly, you can choose a different host runtime by changing/adding the variable `RDAI_HOST_RUNTIME` in the app's Makefile. Available RDAI host runtimes are located at `rdai/host_runtimes` under the `rdai` repo. The default `RDAI_PLATFORM_RUNTIME` and `RDAI_HOST_RUNTIME` setup allows a C-Simulation of the Halide pipeline.
 3. Generate target design: `make compiler && make <TARGET>` where `TARGET` can be `cpu`, `clockwork`, `coreir`, etc.
-4. Run pipeline with implemented hardware kernels: `make run-<TARGET>`
-5. Compare output to cpu output: `make compare-<TARGET>`
+4. Run pipeline with implemented hardware kernels: `make run-<TARGET>` (e.g. `make run-clockwork`)
+5. Compare output to cpu output: `make compare-<TARGET>` (e.g. `make compare-clockwork`)
 
 Here is a list of the different make targets:
 <pre><code>make clean               # remove generated files (bin directory)
