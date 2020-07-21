@@ -33,7 +33,7 @@ Here is a list of the different make targets:
 
 The definition of all of these targets can be found in `apps/hardware_benchmarks/hw_support/hardware_targets.mk`.
 
-## Halide-to-Hardware Directory Tree for An App:
+## Halide-to-Hardware Directory Tree for Apps:
 <pre><code>Halide-to-Hardware
 └── apps
     └── hardware_benchmarks                    // contains simpler test cases
