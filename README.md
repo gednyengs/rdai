@@ -1,4 +1,6 @@
 # RDAI (Reconfigurable Device Access Interface)
+## Usage and Installation:
+Usage and installation can be found [here](USAGE.md)
 ## What is RDAI?
 
 **RDAI** is an API specification for accessing reconfigurable devices and hardware accelerators.
