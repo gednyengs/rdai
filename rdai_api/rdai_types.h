@@ -128,7 +128,7 @@ typedef struct RDAI_AsyncHandle
 {
     RDAI_ID id;
     RDAI_Platform *platform;
-
+    void *user_data;
 } RDAI_AsyncHandle;
 
 /**
